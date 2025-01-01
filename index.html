@@ -174,7 +174,7 @@
 <body>
     <div class="container">
         
-        <p style="text-align: center;">SYSMATE Total Solution v1.2 민수</p>
+        <p style="text-align: center;">SYSMATE Total Solution v1.2 민수 2025.01 </p>
         
         <!-- 네비게이션 버튼 -->
         <div class="nav-buttons">
@@ -444,25 +444,25 @@ function searchItems() {
                         panelHeight = 337.5;
                         pixelPitch = 1.25;
                         powerConsumption = 120;
-                        unitPrices = {  retail: 1323300, dealer: 1140700 };
+                        unitPrices = {  retail: 1203000, dealer: 1037000 };
                     } else if (product === "1.56") {
                         panelWidth = 600;
                         panelHeight = 337.5;
                         pixelPitch = 1.56;
                         powerConsumption = 130;
-                        unitPrices = {  retail: 833800, dealer: 718300 };
+                        unitPrices = {  retail: 758000, dealer: 653000 };
                     } else if (product === "1.87") {
                         panelWidth = 600;
                         panelHeight = 337.5;
                         pixelPitch = 1.87;
                         powerConsumption = 130;
-                        unitPrices = {  retail: 720500, dealer: 620400 };
+                        unitPrices = {  retail: 758000, dealer: 653000 };
                     } else if (product === "2.5") {
                         panelWidth = 480;
                         panelHeight = 480;
                         pixelPitch = 2.5;
                         powerConsumption = 180;
-                        unitPrices = {  retail: 523600, dealer: 451000 };
+                        unitPrices = {  retail: 476000, dealer: 410000 };
                     }
         
                     if (rowCount && columnCount) {
@@ -504,8 +504,8 @@ function searchItems() {
                             <p>해상도: ${resolutionWidth} x ${resolutionHeight} (픽셀)</p>
                             <p>대각선 길이: ${diagonalInInches} 인치</p>
                             <p>최대소비전력: ${totalPower} W</p>
-                            <p>민수(소비자가): ₩${totalPrices.retail.toLocaleString()}</p>
-                            <p>민수(대리점가): ₩${totalPrices.dealer.toLocaleString()}</p>
+                            <p>민수(소비자가)vat별도: ₩${totalPrices.retail.toLocaleString()}</p>
+                            <p>민수(대리점가)vat별도: ₩${totalPrices.dealer.toLocaleString()}</p>
                         `;
                     } else {
                         document.getElementById("led-result").innerHTML = "<p>값을 모두 입력해주세요.</p>";
