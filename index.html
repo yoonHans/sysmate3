@@ -349,10 +349,10 @@ function searchItems() {
                     const columnCount = parseInt(document.getElementById("columns").value, 10);
         
                     const products = {
-                        1: { name: "VW550E-5LW", width: 1212.2, height: 683, weight: 19.6, power: 187.5, retail: 1914000,dealer:1540000 },
-                        2: { name: "VW550E-7LW ", width: 1212.2, height: 683, weight: 19.7, power: 242.0, retail: 2167000,dealer:1749000},
-                        3: { name: "VW550R-5LW", width: 1210.51, height: 681.22, weight: 18.5, power: 233.5, retail: 2442000,dealer:1969000 },
-                        4: { name: "VW550R-7LW", width: 1210.51, height: 681.22, weight: 18.1, power: 233.5, retail: 2684000,dealer:2156000}
+                        1: { name: "VW550E-5LW", width: 1212.2, height: 683, weight: 19.6, power: 187.5, retail: 1740000,dealer:1400000 },
+                        2: { name: "VW550E-7LW ", width: 1212.2, height: 683, weight: 19.7, power: 242.0, retail: 1970000,dealer:1590000},
+                        3: { name: "VW550R-5LW", width: 1210.51, height: 681.22, weight: 18.5, power: 233.5, retail: 2220000,dealer:1790000 },
+                        4: { name: "VW550R-7LW", width: 1210.51, height: 681.22, weight: 18.1, power: 233.5, retail: 2444000,dealer:1960000}
                     };
         
                     const selectedProduct = products[product];
@@ -399,8 +399,8 @@ function searchItems() {
                         <p>화면 비율(16:9 기준): ${aspectRatioText}</p>
                         <p>전체 무게: ${totalWeight} kg</p>
                         <p>최대소비 전력: ${totalPower} W</p>
-                        <p>민수(소비자가): ₩${totalPrices.retail.toLocaleString()}</p>
-                        <p>민수(대리점가): ₩${totalPrices.dealer.toLocaleString()}</p>
+                        <p>민수(소비자가)vat별도기준: ₩${totalPrices.retail.toLocaleString()}</p>
+                        <p>민수(대리점가)vat별도기준: ₩${totalPrices.dealer.toLocaleString()}</p>
                     `;
         
                     renderVisualization(totalRows, totalColumns, orientation);
