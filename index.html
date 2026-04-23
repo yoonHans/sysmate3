@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYSMATE DailyReport</title>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+    <style>
+        :root {
+            --bg-main: #0f111a;
+            --bg-card: #1a1d2b;
+            --bg-input: #25293d;
+            --text-main: #e0e6ed;
+            --text-dim: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #2d334a;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background: var(--bg-main);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 1.5rem;
+        }
+
+        .wrap {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ── Header & Navigation ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1rem;
+            gap: 16px;
+        }
+
+        .header-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .header-meta label {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .header-meta-inputs {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+
+        .pg-title {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: var(--accent);
+        }
+
+        .pg-sub {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-top: 4px;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-card);
+            padding: 6px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            font-size: 13px;
+            padding: 8px 18px;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all .2s;
+        }
+
+        .tab-btn.active {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ── Layout ── */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .two-col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* ── Cards ── */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-head {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 4px solid var(--accent);
+            padding-left: 10px;
+        }
+
+        .card-head.green {
+            border-left-color: var(--success);
+        }
+
+        .card-head.amber {
+            border-left-color: var(--warning);
+        }
+
+        .card-head.red {
+            border-left-color: var(--danger);
+        }
+
+        .card-head.blue {
+            border-left-color: var(--accent);
+        }
+
+        .cnt {
+            font-size: 12px;
+            background: var(--bg-input);
+            padding: 2px 8px;
+            border-radius: 20px;
+        }
+
+        /* ── KPI Stats ── */
+        .kpi {
+            text-align: center;
+        }
+
+        .kpi-label {
+            font-size: 12px;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+        }
+
+        .kpi-val {
+            font-size: 32px;
+            font-weight: 800;
+        }
+
+        .green {
+            color: var(--success);
+        }
+
+        .amber {
+            color: var(--warning);
+        }
+
+        .red {
+            color: var(--danger);
+        }
+
+        .blue {
+            color: var(--accent);
+        }
+
+        /* ── Row items ── */
+        .row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            margin-bottom: 8px;
+            font-size: 13.5px;
+            transition: transform 0.1s;
+            counter-increment: row-counter;
+        }
+
+        .row:hover {
+            transform: scale(1.01);
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .d-done {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .d-wip {
+            background: var(--warning);
+            box-shadow: 0 0 8px var(--warning);
+        }
+
+        .d-todo {
+            background: #64748b;
+        }
+
+        .row-name {
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .row-name::before {
+            content: counter(row-counter) ". ";
+            font-weight: 700;
+            color: var(--accent);
+            margin-right: 4px;
+        }
+
+        #taskList,
+        #wipList,
+        #issueList,
+        #planList {
+            counter-reset: row-counter;
+        }
+
+        .row-sub {
+            font-size: 11px;
+            color: var(--text-dim);
+            display: block;
+            margin-top: 2px;
+        }
+
+        /* ── Inputs ── */
+        input,
+        select,
+        textarea {
+            background: var(--bg-input);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 13px;
+            outline: none;
+            font-family: inherit;
+        }
+
+        input:focus {
+            border-color: var(--accent);
+        }
+
+        .add-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        /* ── Buttons ── */
+        .btn {
+            padding: 10px 16px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: 0.2s;
+            background: var(--bg-input);
+            color: var(--text-main);
+        }
+
+        .btn-capture {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-capture:hover {
+            background: #0d9488;
+        }
+
+        .btn:hover {
+            background: #333952;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--accent-hover);
+        }
+
+
+
+        .row-actions button {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            cursor: pointer;
+            font-size: 11px;
+            padding: 4px;
+        }
+
+        .row-actions button:hover {
+            color: var(--text-main);
+        }
+
+        /* ── Table/List Style ── */
+        .list-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .list-table th {
+            text-align: left;
+            padding: 12px;
+            color: var(--text-dim);
+            font-size: 12px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .list-table td {
+            padding: 12px;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        /* ── Floating Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 30px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            visibility: hidden;
+            transition: 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        @media print {
+
+            .tab-bar,
+            .add-row,
+            .bottom-actions,
+            .btn-capture {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="wrap" id="capture-area">
+        <header>
+            <div>
+                <div class="pg-title">SYSMATE DailyReport</div>
+                <div class="pg-sub" id="current-info">기술연구소 | 한승윤 수석</div>
+            </div>
+            <div class="header-meta">
+                <label>REPORTER / DATE</label>
+                <div class="header-meta-inputs">
+                    <input type="text" id="reporter" placeholder="보고자" style="width:110px" value="한승윤">
+                    <input type="date" id="rdate" value="2026-04-24">
+                </div>
+            </div>
+            <div class="tab-bar">
+                <button class="tab-btn active" onclick="switchTab('daily', this)">DAILY</button>
+                <button class="tab-btn" onclick="switchTab('weekly', this)">WEEKLY</button>
+                <button class="tab-btn" onclick="switchTab('list', this)">HISTORY</button>
+            </div>
+        </header>
+
+        <div id="tab-daily" class="tab-content active">
+            <div class="dashboard-grid">
+                <div class="card kpi">
+                    <div class="kpi-label"> 완료업무 COMPLETED</div>
+                    <div class="kpi-val green" id="k1">1</div>
+                </div>
+                <div class="card kpi">
+                    <div class="kpi-label">진행중업무 IN PROGRESS</div>
+                    <div class="kpi-val amber" id="k2">4</div>
+                </div>
+                <div class="card kpi">
+                    <div class="kpi-label">중요업무 MAIN PROJECT</div>
+                    <div class="kpi-val red" id="k3">2</div>
+                </div>
+                <div class="card kpi">
+                    <div class="kpi-label">내일 계획 NEXT PLANS</div>
+                    <div class="kpi-val blue" id="k4">1</div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-head green">금일업무 TODAY'S PERFORMANCE <span class="cnt" id="c1">5건</span></div>
+                    <div id="taskList">
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">31221</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">33213</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">3123</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">1342<span
+                                    style="font-size:11px; color:var(--accent); font-weight:700; margin-left:8px;">[60%]</span>
+                            </div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-done"></div>
+                            <div class="row-name">ㄷㅈㄱㄷ</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-row" style="flex-wrap:wrap; gap:8px;">
+                        <input type="text" id="tName" placeholder="업무 내용" style="flex:3; min-width:200px;" value="">
+                        <input type="number" id="tProg" placeholder="%" style="width: 55px; visibility: visible;"
+                            min="0" max="100" value="">
+                        <input type="date" id="tDate"
+                            style="width:110px; background:#252836; border:1px solid #3f445e; color:var(--text-main); font-size:11px; padding:2px 4px;">
+                        <select id="tStat" style="width:70px" onchange="toggleProg()">
+                            <option value="done">완료</option>
+                            <option value="wip" selected="selected">진행</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="addTask()">ADD</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-head amber">진행업무 ONGOING PROJECTS <span class="cnt" id="c2">4건</span></div>
+                    <div id="wipList">
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">31221</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">33213</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">3123</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-wip"></div>
+                            <div class="row-name">1342<span
+                                    style="font-size:11px; color:var(--accent); font-weight:700; margin-left:8px;">[60%]</span>
+                            </div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-row">
+                        <input type="text" id="wName" placeholder="진행 중인 프로젝트" style="flex:1" value="">
+                        <input type="date" id="wDate"
+                            style="width:110px; background:#252836; border:1px solid #3f445e; color:var(--text-main); font-size:11px; padding:2px 4px;">
+                        <button class="btn btn-primary" onclick="addWip()">ADD</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-head red">중요업무 MAIN PROJECT <span class="cnt" id="c3">2건</span></div>
+                    <div id="issueList">
+                        <div class="row">
+                            <div class="dot d-done"></div>
+                            <div class="row-name">111</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="dot d-done"></div>
+                            <div class="row-name">ㄷㅂㅈㄷ</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-row" style="flex-wrap:wrap; gap:8px;">
+                        <input type="text" id="iName" placeholder="중요업무 내용" style="flex:3; min-width:200px;" value="">
+                        <input type="number" id="iProg" placeholder="%" style="width: 55px; visibility: hidden;" min="0"
+                            max="100" value="">
+                        <input type="date" id="iDate"
+                            style="width:110px; background:#252836; border:1px solid #3f445e; color:var(--text-main); font-size:11px; padding:2px 4px;">
+                        <select id="iStat" style="width:70px" onchange="toggleProgI()">
+                            <option value="done" selected>완료</option>
+                            <option value="wip">진행</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="addIssue()">ADD</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-head blue">내일 계획 NEXT PLAN <span class="cnt" id="c4">1건</span></div>
+                    <div id="planList">
+                        <div class="row">
+                            <div class="dot d-todo"></div>
+                            <div class="row-name">1111</div>
+                            <div class="row-actions">
+                                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="add-row">
+                        <input type="text" id="pName" placeholder="내일 계획" style="flex:1" value="">
+                        <button class="btn btn-primary" onclick="addPlan()">ADD</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-bottom:1.5rem">
+                <div class="card-head">특이사항 MEMO</div>
+                <textarea id="dailyMemo"
+                    style="width:100%; min-height:80px; background: transparent; border:none; resize:none; font-family: inherit;"
+                    placeholder=" "></textarea>
+            </div>
+
+            <div style="display:flex; justify-content: flex-end; align-items:center">
+                <div class="bottom-actions" style="display:flex; gap:10px">
+                    <button class="btn" onclick="exportHTML()" style="background:var(--accent); color:white">📄 HTML
+                        내보내기</button>
+                    <button class="btn btn-capture" onclick="captureScreen()">📸 화면 캡처</button>
+                    <button class="btn" onclick="saveDaily()">💾 저장</button>
+                    <button class="btn btn-primary" onclick="window.print()">Print PDF</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-weekly" class="tab-content">
+            <!-- renderWeekly()에서 동적으로 생성됨 -->
+        </div>
+
+        <div id="tab-list" class="tab-content">
+            <div class="card">
+                <div class="card-head">REPORT HISTORY</div>
+                <table class="list-table">
+                    <thead>
+                        <tr>
+                            <th>DATE</th>
+                            <th>REPORTER</th>
+                            <th>STATUS</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">✅ 모든 내용이 안전하게 저장되었습니다.</div>
+
+    <script>
+        /* ── 전역 상태 ── */
+        let savedDailyList = JSON.parse(localStorage.getItem('dailySaved_Dark') || '[]');
+
+        /* ── 탭 전환 ── */
+        function switchTab(id, btn) {
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById('tab-' + id).classList.add('active');
+            btn.classList.add('active');
+            if (id === 'list') renderHistory();
+            if (id === 'weekly') renderWeekly();
+        }
+
+
+
+        /* ── 업무 추가 기능 (Build Row) ── */
+        function toggleProg() {
+            const stat = document.getElementById('tStat').value;
+            const prog = document.getElementById('tProg');
+            prog.style.visibility = (stat === 'wip') ? 'visible' : 'hidden';
+        }
+
+        function toggleProgI() {
+            const stat = document.getElementById('iStat').value;
+            const prog = document.getElementById('iProg');
+            prog.style.visibility = (stat === 'wip') ? 'visible' : 'hidden';
+        }
+
+        // 진행률 표시를 위한 공통 헬퍼 함수
+        function getProgHTML(progress) {
+            if (!progress) return '';
+            return `
+                <div class="prog-container" style="display:inline-flex; align-items:center; margin-left:12px; gap:8px; vertical-align:middle;">
+                    <div style="width:60px; height:6px; background:var(--bg-main); border-radius:10px; overflow:hidden; border:1px solid var(--border);">
+                        <div style="width:${progress}%; height:100%; background:var(--accent); box-shadow:0 0 5px var(--accent);"></div>
+                    </div>
+                    <span style="font-size:11px; color:var(--accent); font-weight:700; min-width:30px;">${progress}%</span>
+                </div>
+            `;
+        }
+
+        function getDateHTML(date) {
+            if (!date) return '';
+            const d = new Date(date);
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `<span class="row-date" style="font-size:10px; color:var(--text-dim); margin-left:10px; border-left:1px solid var(--border); padding-left:10px;">~${mm}-${dd}</span>`;
+        }
+
+        function buildRow(name, type, listId, progress = '', taskId = '', dueDate = '') {
+            const row = document.createElement('div');
+            row.className = 'row';
+            if (taskId) row.setAttribute('data-task-id', taskId);
+            const dotClass = type === 'done' ? 'd-done' : (type === 'wip' ? 'd-wip' : 'd-todo');
+            const progTag = getProgHTML(progress);
+            const dateTag = getDateHTML(dueDate);
+
+            row.innerHTML = `
+            <div class="dot ${dotClass}"></div>
+            <div class="row-name" data-name="${name}" data-prog="${progress}" data-date="${dueDate}">${name}${progTag}${dateTag}</div>
+            <div class="row-actions">
+                <button onclick="editRow(this)">MOD</button>
+                <button onclick="this.parentElement.parentElement.remove(); updateKPI();">DEL</button>
+            </div>
+        `;
+            document.getElementById(listId).appendChild(row);
+            updateKPI();
+        }
+
+        function editRow(btn) {
+            const row = btn.parentElement.parentElement;
+            const nameNode = row.querySelector('.row-name');
+
+            const currentName = nameNode.dataset.name || "";
+            const currentProgress = nameNode.dataset.prog || "";
+            const currentDate = nameNode.dataset.date || "";
+
+            // 인라인 편집 UI로 교체
+            nameNode.innerHTML = `
+                <div class="edit-box" style="display:flex; gap:5px; width:100%; align-items:center; flex-wrap:wrap;">
+                    <input type="text" class="edit-name" value="${currentName}" style="flex:1; min-width:150px; background:var(--bg-main); border:1px solid var(--accent); padding:4px 8px;">
+                    <input type="date" class="edit-date" value="${currentDate}" style="width:110px; background:#252836; border:1px solid var(--accent); padding:3px 4px; font-size:11px; color:var(--text-main);">
+                    ${currentProgress !== '' ? `<input type="number" class="edit-prog" value="${currentProgress}" style="width:55px; background:var(--bg-main); border:1px solid var(--accent); padding:4px 4px;" min="0" max="100">` : ''}
+                    <button onclick="saveEdit(this)" style="background:var(--success); color:white; border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:11px;">OK</button>
+                    <button onclick="cancelEdit(this)" style="background:var(--bg-input); color:var(--text-dim); border:none; border-radius:4px; padding:4px 8px; cursor:pointer; font-size:11px;">X</button>
+                </div>
+            `;
+
+            row.querySelector('.row-actions').style.display = 'none';
+            nameNode.querySelector('.edit-name').focus();
+        }
+
+        function saveEdit(btn) {
+            const editBox = btn.parentElement;
+            const nameNode = editBox.parentElement;
+            const row = nameNode.parentElement;
+            const taskId = row.getAttribute('data-task-id');
+
+            const newName = editBox.querySelector('.edit-name').value;
+            const progInput = editBox.querySelector('.edit-prog');
+            const newProgress = progInput ? progInput.value : '';
+            const newDate = editBox.querySelector('.edit-date').value;
+
+            if (!newName) {
+                alert("내용을 입력해주세요.");
+                return;
+            }
+
+            // 본인 데이터 갱신
+            nameNode.dataset.name = newName;
+            nameNode.dataset.prog = newProgress;
+            nameNode.dataset.date = newDate;
+            nameNode.innerHTML = `${newName}${getProgHTML(newProgress)}${getDateHTML(newDate)}`;
+
+            // 동일한 taskId를 가진 다른 리스트의 항목도 동기화
+            if (taskId) {
+                document.querySelectorAll(`[data-task-id="${taskId}"]`).forEach(r => {
+                    if (r !== row) {
+                        const otherNameNode = r.querySelector('.row-name');
+                        if (otherNameNode) {
+                            otherNameNode.dataset.name = newName;
+                            otherNameNode.dataset.prog = newProgress;
+                            otherNameNode.dataset.date = newDate;
+                            otherNameNode.innerHTML = `${newName}${getProgHTML(newProgress)}${getDateHTML(newDate)}`;
+                        }
+                    }
+                });
+            }
+
+            row.querySelector('.row-actions').style.display = 'flex';
+            updateKPI();
+        }
+
+        function cancelEdit(btn) {
+            const nameNode = btn.parentElement.parentElement;
+            const row = nameNode.parentElement;
+
+            const oldName = nameNode.dataset.name;
+            const oldProg = nameNode.dataset.prog;
+            const oldDate = nameNode.dataset.date;
+
+            nameNode.innerHTML = `${oldName}${getProgHTML(oldProg)}${getDateHTML(oldDate)}`;
+            row.querySelector('.row-actions').style.display = 'flex';
+        }
+
+        function addTask() {
+            const n = document.getElementById('tName').value; if (!n) return;
+            const s = document.getElementById('tStat').value;
+            const p = document.getElementById('tProg').value;
+            const d = document.getElementById('tDate').value;
+            const taskId = 'task-' + Date.now();
+
+            buildRow(n, s, 'taskList', s === 'wip' ? p : '', taskId, d);
+
+            if (s === 'wip') {
+                buildRow(n, 'wip', 'wipList', p, taskId, d);
+            }
+
+            document.getElementById('tName').value = '';
+            document.getElementById('tProg').value = '';
+            document.getElementById('tDate').value = '';
+        }
+        function addWip() {
+            const n = document.getElementById('wName').value; if (!n) return;
+            const d = document.getElementById('wDate').value;
+            buildRow(n, 'wip', 'wipList', '', 'wip-' + Date.now(), d);
+            document.getElementById('wName').value = '';
+            document.getElementById('wDate').value = '';
+        }
+        function addIssue() {
+            const n = document.getElementById('iName').value; if (!n) return;
+            const s = document.getElementById('iStat').value;
+            const p = document.getElementById('iProg').value;
+            const d = document.getElementById('iDate').value;
+            const taskId = 'main-' + Date.now();
+
+            buildRow(n, s, 'issueList', s === 'wip' ? p : '', taskId, d);
+
+            if (s === 'wip') {
+                buildRow(n, 'wip', 'wipList', p, taskId, d);
+            }
+
+            document.getElementById('iName').value = '';
+            document.getElementById('iProg').value = '';
+            document.getElementById('iDate').value = '';
+            document.getElementById('iStat').value = 'done';
+            toggleProgI();
+        }
+        function addPlan() {
+            const n = document.getElementById('pName').value; if (!n) return;
+            buildRow(n, 'todo', 'planList', '', 'plan-' + Date.now());
+            document.getElementById('pName').value = '';
+        }
+
+        function exportHTML() {
+            // 1. 입력된 현재 값들을 HTML 속성에 강제 반영 (outerHTML 보존용)
+            document.querySelectorAll('input').forEach(input => {
+                input.setAttribute('value', input.value);
+            });
+            document.querySelectorAll('textarea').forEach(textarea => {
+                textarea.textContent = textarea.value;
+            });
+            document.querySelectorAll('select').forEach(select => {
+                Array.from(select.options).forEach(opt => {
+                    if (opt.value === select.value) opt.setAttribute('selected', 'selected');
+                    else opt.removeAttribute('selected');
+                });
+            });
+
+            // 2. 전체 HTML 소스 추출
+            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+
+            // 3. 파일명 생성 및 다운로드
+            const reporter = document.getElementById('reporter').value || '보고자';
+            const date = document.getElementById('rdate').value || new Date().toISOString().split('T')[0];
+            const fileName = `업무보고_${reporter}_${date}.html`;
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = fileName;
+            link.click();
+            showToast("💾 HTML 파일이 내보내졌습니다.");
+        }
+
+        function updateKPI() {
+            const tDone = document.querySelectorAll('#taskList .d-done').length;
+            const iDone = document.querySelectorAll('#issueList .d-done').length;
+            document.getElementById('k1').textContent = tDone + iDone;
+            document.getElementById('k2').textContent = document.querySelectorAll('#wipList .row').length;
+            document.getElementById('k3').textContent = document.querySelectorAll('#issueList .row').length;
+            document.getElementById('k4').textContent = document.querySelectorAll('#planList .row').length;
+
+            document.getElementById('c1').textContent = document.querySelectorAll('#taskList .row').length + '건';
+            document.getElementById('c2').textContent = document.querySelectorAll('#wipList .row').length + '건';
+            document.getElementById('c3').textContent = document.querySelectorAll('#issueList .row').length + '건';
+            document.getElementById('c4').textContent = document.querySelectorAll('#planList .row').length + '건';
+        }
+
+        /* ── 저장 기능 ── */
+        function getListItems(id) {
+            return Array.from(document.querySelectorAll(`#${id} .row`)).map(row => {
+                const nameNode = row.querySelector('.row-name');
+                const dot = row.querySelector('.dot');
+                let type = 'todo';
+                if (dot.classList.contains('d-done')) type = 'done';
+                if (dot.classList.contains('d-wip')) type = 'wip';
+
+                // 진행률 추출 ([70%] 형태)
+                return {
+                    name: nameNode.dataset.name,
+                    type: type,
+                    progress: nameNode.dataset.prog,
+                    date: nameNode.dataset.date,
+                    taskId: row.getAttribute('data-task-id') || ''
+                };
+            });
+        }
+
+        function saveDaily() {
+            const date = document.getElementById('rdate').value || new Date().toISOString().split('T')[0];
+            const listsData = {
+                taskList: getListItems('taskList'),
+                wipList: getListItems('wipList'),
+                issueList: getListItems('issueList'),
+                planList: getListItems('planList')
+            };
+
+            // 1. 히스토리 기록 (상세 리스트 포함)
+            const record = {
+                id: Date.now(),
+                date: date,
+                reporter: document.getElementById('reporter').value || 'Unknown',
+                lists: listsData,
+                kpis: [
+                    document.getElementById('k1').textContent,
+                    document.getElementById('k2').textContent,
+                    document.getElementById('k3').textContent
+                ]
+            };
+            savedDailyList.unshift(record);
+            localStorage.setItem('dailySaved_Dark', JSON.stringify(savedDailyList));
+
+            // 2. 현재 화면의 모든 내용 저장 (새로고침 대비)
+            const draft = {
+                reporter: document.getElementById('reporter').value,
+                rdate: document.getElementById('rdate').value,
+                memo: document.getElementById('dailyMemo').value,
+                lists: listsData
+            };
+            localStorage.setItem('dailyReport_Draft', JSON.stringify(draft));
+
+            showToast("✅ 모든 내용이 안전하게 저장되었습니다.");
+            renderHistory();
+        }
+
+        function loadDaily() {
+            const data = JSON.parse(localStorage.getItem('dailyReport_Draft'));
+            if (!data) return;
+
+            if (data.reporter) document.getElementById('reporter').value = data.reporter;
+            if (data.rdate) document.getElementById('rdate').value = data.rdate;
+            if (data.memo) document.getElementById('dailyMemo').value = data.memo;
+
+            if (data.lists) {
+                Object.entries(data.lists).forEach(([id, items]) => {
+                    const listEl = document.getElementById(id);
+                    if (listEl) {
+                        listEl.innerHTML = '';
+                        items.forEach(item => buildRow(item.name, item.type, id, item.progress, item.taskId, item.date));
+                    }
+                });
+            }
+            updateKPI();
+        }
+
+        /* ── 화면 캡처 기능 (고도화 버전) ── */
+        function captureScreen() {
+            const area = document.getElementById('capture-area');
+            showToast("📸 캡처를 준비 중입니다...");
+
+            html2canvas(area, {
+                backgroundColor: '#0f111a',
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                onclone: (clonedDoc) => {
+                    const style = clonedDoc.createElement('style');
+                    style.innerHTML = `
+                        * { 
+                            animation: none !important; 
+                            transition: none !important; 
+                            opacity: 1 !important; 
+                        }
+                        .bottom-actions, .btn-capture, .add-row, .tab-bar { 
+                            display: none !important; 
+                        }
+                    `;
+                    clonedDoc.head.appendChild(style);
+                }
+            }).then(canvas => {
+                const link = document.createElement('a');
+                const reporter = document.getElementById('reporter').value || '보고자';
+                const date = document.getElementById('rdate').value || new Date().toISOString().split('T')[0];
+                link.download = `업무보고_${reporter}_${date}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                showToast("✅ 이미지가 저장되었습니다.");
+            }).catch(err => {
+                console.error('Capture Error:', err);
+                showToast("❌ 캡처 실패");
+            });
+        }
+
+        function renderWeekly(targetDate) {
+            const weeklyTab = document.getElementById('tab-weekly');
+
+            // 날짜 파싱 헬퍼 (로컬 시간 기준)
+            const parseDate = (dStr) => {
+                if (dStr instanceof Date) return dStr;
+                const [y, m, d] = dStr.split('-').map(Number);
+                return new Date(y, m - 1, d);
+            };
+
+            // 기준일 설정 (없으면 오늘)
+            const baseDate = targetDate ? parseDate(targetDate) : new Date();
+
+            // 해당 주의 월요일 찾기
+            const day = baseDate.getDay() || 7;
+            const monday = new Date(baseDate);
+            monday.setDate(baseDate.getDate() - day + 1);
+            monday.setHours(0, 0, 0, 0);
+
+            // 금요일 계산 (월요일 + 4일)
+            const friday = new Date(monday);
+            friday.setDate(monday.getDate() + 4);
+            friday.setHours(23, 59, 59, 999);
+
+            const weekStr = `${monday.getFullYear()}-${monday.getMonth() + 1}-${monday.getDate()} ~ ${friday.getMonth() + 1}-${friday.getDate()} (월~금)`;
+
+            // 해당 주 데이터 필터링 (월~금 범위)
+            const weekRecords = savedDailyList.filter(r => {
+                const rd = parseDate(r.date);
+                return rd >= monday && rd <= friday;
+            });
+
+            // 데이터 합산 (중복 제거 및 최신 진행률 유지)
+            const aggregate = (type) => {
+                const map = new Map();
+                // 저장된 모든 기록을 날짜순으로 정렬하여 처리
+                const sortedRecords = [...weekRecords].sort((a, b) => parseDate(a.date) - parseDate(b.date));
+
+                sortedRecords.forEach(r => {
+                    if (r.lists && r.lists[type]) {
+                        r.lists[type].forEach(item => {
+                            const key = item.taskId || item.name;
+                            // 동일 taskId인 경우 나중 날짜의 데이터로 덮어씌움
+                            map.set(key, { ...item, saveDate: r.date });
+                        });
+                    }
+                });
+                return Array.from(map.values());
+            };
+
+            const tasks = aggregate('taskList');
+            const mainProjects = aggregate('issueList');
+            const wips = aggregate('wipList');
+
+            const doneTasks = tasks.filter(t => t.type === 'done');
+            const doneMain = mainProjects.filter(t => t.type === 'done');
+            const doneCount = doneTasks.length + doneMain.length;
+
+            const dateValue = baseDate.toISOString().split('T')[0];
+
+            weeklyTab.innerHTML = `
+                <div style="margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border); padding-bottom:15px; flex-wrap:wrap; gap:15px;">
+                    <div>
+                        <h2 style="margin:0; font-size:1.1rem; color:var(--accent);">📅 WEEKLY SUMMARY</h2>
+                        <div style="font-size:0.85rem; color:var(--text-dim); margin-top:4px;">${weekStr}</div>
+                    </div>
+                    <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.03); padding:8px 12px; border-radius:8px; border:1px solid var(--border);">
+                        <label style="font-size:12px; color:var(--text-dim);">주간 조회:</label>
+                        <input type="date" value="${dateValue}" onchange="renderWeekly(this.value)" 
+                            style="background:#252836; border:1px solid #3f445e; color:white; padding:4px 8px; font-size:12px; border-radius:4px; outline:none;">
+                    </div>
+                </div>
+                
+                <div class="dashboard-grid" style="margin-bottom:20px;">
+                    <div class="card kpi">
+                        <div class="kpi-label">주간 완료 TOTAL DONE</div>
+                        <div class="kpi-val green">${doneCount}</div>
+                    </div>
+                    <div class="card kpi">
+                        <div class="kpi-label">주간 진행 ONGOING</div>
+                        <div class="kpi-val amber">${wips.length}</div>
+                    </div>
+                    <div class="card kpi">
+                        <div class="kpi-label">주간 중요업무 MAIN PROJECT</div>
+                        <div class="kpi-val red">${mainProjects.length}</div>
+                    </div>
+                </div>
+
+                <div class="two-col">
+                    <div class="card">
+                        <div class="card-head green">WEEKLY COMPLETED (완료 리스트)</div>
+                        <div class="weekly-list" style="max-height:450px; overflow-y:auto;">
+                            ${doneTasks.concat(doneMain).map(t => `
+                                <div class="row" style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                                    <div class="dot d-done"></div>
+                                    <div class="row-name" style="font-size:13px">${t.name} 
+                                        <span style="font-size:10px; color:var(--text-dim); margin-left:8px; opacity:0.6;">[${t.saveDate}]</span>
+                                    </div>
+                                </div>
+                            `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:40px;">선택한 주간에 완료된 업무가 없습니다.</p>'}
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-head amber">WEEKLY IN-PROGRESS (진행 중)</div>
+                        <div class="weekly-list" style="max-height:450px; overflow-y:auto;">
+                            ${wips.map(t => `
+                                <div class="row" style="padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05)">
+                                    <div class="dot d-wip"></div>
+                                    <div class="row-name" style="font-size:13px">${t.name} ${getProgHTML(t.progress)}</div>
+                                </div>
+                            `).join('') || '<p style="text-align:center; color:var(--text-dim); padding:40px;">선택한 주간에 진행 중인 업무가 없습니다.</p>'}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderHistory() {
+            const body = document.getElementById('historyBody');
+            body.innerHTML = savedDailyList.map(r => `
+            <tr>
+                <td>${r.date}</td>
+                <td>${r.reporter}</td>
+                <td>완료:${r.kpis[0]} / 진행:${r.kpis[1]}</td>
+                <td><button class="btn" style="padding:4px 8px" onclick="deleteHistory(${r.id})">삭제</button></td>
+            </tr>
+        `).join('');
+        }
+
+        function deleteHistory(id) {
+            savedDailyList = savedDailyList.filter(x => x.id !== id);
+            localStorage.setItem('dailySaved_Dark', JSON.stringify(savedDailyList));
+            renderHistory();
+        }
+
+
+
+        function showToast(msg) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            setTimeout(() => t.classList.remove('show'), 2500);
+        }
+
+        /* ── 초기 세팅 ── */
+        window.addEventListener('DOMContentLoaded', () => {
+            const dateInput = document.getElementById('rdate');
+            if (dateInput) dateInput.value = new Date().toISOString().split('T')[0];
+            loadDaily();
+            toggleProg();
+            toggleProgI();
+        });
+    </script>
+
+
+
+</body>
+
+</html>
